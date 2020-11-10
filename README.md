@@ -1,3 +1,3 @@
 # Scribble-Algorithm
 Given an image, convert it into an art style resembling a somwhat chaotic scribble.
-<iamge>Zombie.png</image>
+<td><img align="center" src="Zombie.png"></td>
