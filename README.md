@@ -1,5 +1,5 @@
 # Scribble-Algorithm
-Given an image, convert it into an art style resembling a somwhat chaotic scribble. 
+Given an image, convert it into an art style resembling a somwhat chaotic scribble. </br>
 Link To The Project: https://editor.p5js.org/Mandaranian-Cactus/sketches/ZJm7t0Rzn
 <table>
   <tr>
