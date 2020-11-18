@@ -5,6 +5,6 @@ Link To The Project: https://editor.p5js.org/Mandaranian-Cactus/sketches/ZJm7t0R
 <table>
   <tr>
     <td><img align="center" src="Images/Nunu.PNG"></td>
-    <td><img align="center" src="Zombie.PNG"></td>
+    <td><img align="center" src="Images/NewPaper Zombie.PNG"></td>
   </tr>
 </table>
