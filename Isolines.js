@@ -1,4 +1,6 @@
 function chunkImage(img, gridScale){
+  // Given an image, chunk it into color segments
+  // These color segmnets will simply be the average color of the region they occupy
   midGrid = [];
   for (let y = 0; y < int(img.height/gridScale +0.9990); y++){
     let row = [];
@@ -21,19 +23,11 @@ function chunkImage(img, gridScale){
     }
   }
   
-  background(200, 0, 255)
-  noStroke();
-  for (let y = 0; y < midGrid.length; y++){
-    for (let x = 0; x < midGrid[0].length; x++){
-      fill(midGrid[y][x]);
-      rect(x * gridScale, y * gridScale, 10, 10)
-    }
-  }
-  
+  return midGrid;
 }
 
 function createIsolines(targetColor, midGrid, gridScale){
-  
+  // Given a chunked image, draw isolines that follow a given color
   let binaryMidGrid = [];
   for (let y = 0; y < midGrid.length;y ++){
     let row = [];
@@ -48,12 +42,15 @@ function createIsolines(targetColor, midGrid, gridScale){
   for (let y = 0; y < midGrid.length - 1; y++){
     for (let x = 0; x < midGrid[0].length - 1; x++){
       let outcome = 0;
+      // Use an "OR" bit operator followed by a "left shift" bit operator going clockwise from top-left to perform bitmasking
+      // Bitmasking creates all permutations of possible arrangements of these 4 points
       outcome = (outcome | binaryMidGrid[y][x]) << 1;
       outcome = (outcome | binaryMidGrid[y][x + 1]) << 1;
       outcome = (outcome | binaryMidGrid[y + 1][x + 1]) << 1;
       outcome = outcome | binaryMidGrid[y + 1][x];
       
-      // Find out which outcome it is (of the 16 possible ones)
+      
+      // Find out which arrangement it is (of the 16 possible ones) according to a lookup table
       if (outcome == 0) continue;
       else if (outcome == 1){
         let p1 = findLeft(midGrid, x, y, gridScale, targetColor);
@@ -136,10 +133,8 @@ function createIsolines(targetColor, midGrid, gridScale){
     
   }
   strokeWeight(0.3);
-  stroke(200, 0, 0, 255)
+  stroke(200, 0, 0, 155)
   for (let lineSeg of lineSegs){
-    // circle(lineSeg[0].x, lineSeg[0].y, 10)
-    // circle(lineSeg[1].x, lineSeg[1].y, 10)
     line(lineSeg[0].x, lineSeg[0].y,lineSeg[1].x, lineSeg[1].y)
   }
 }
@@ -161,10 +156,12 @@ function findTop(midGrid, x, y, gridScale, targetColor){
 }
 
 function gito(index, gridScale){
+  // Convert a grid index into a screen coordinate
   return gridScale/2 + index * gridScale;
 }
 
 function pointFinder(color1, color2, targetColor, pos1, pos2){
+  // Given 2 points with positions and colors, find out the position of a third point whose color is in between that of the other two points.
   let percent = (targetColor - min(color1, color2)) / abs(color2 - color1);
   let newPos;
   if (color1 > color2){
