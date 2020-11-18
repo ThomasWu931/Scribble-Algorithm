@@ -1,4 +1,5 @@
 function splineChain(points){
+  // Combine several catmull rom splines
   fill(200, 0, 0, 75) // Darker sections are more opaque and less transparent
   for (let i = 0; i < points.length - 3; i++){
     createSpline(points[i], points[i + 1], points[i + 2], points[i + 3]);
@@ -6,7 +7,8 @@ function splineChain(points){
 }
 
 function createSpline(p0, p1, p2, p3){
-  
+  // Standard implmention of catumul rom splines
+  // Given 4 control points, create a curve between p1 and p2
   let t0 = 0;
   let t1 = t0 + pow(sqrt(pow(p0.x - p1.x, 2) + pow(p0.y - p1.y, 2)),1);
   let t2 = t1 + pow(sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2)),1);
