@@ -14,6 +14,8 @@ while process_list not empty:
 */
 
 function sigmoid(x, mag){
+  // Given a number between 0 - 1, steer the number towards one pole 
+  // Used in this algorthm for adding polarity (dark gets darker, light gets lighter)
   let y = 1/(1 + pow(x/(1-x), -mag));
   return y;
 }
@@ -59,7 +61,7 @@ function inNeighborHood(p, grid, cellSize, minRadius){
   return false;  // No neighbors are too close
 }
 
-function weightedPoissonDiskSampling(img, pointGenCnt, minDist, maxDist, sigmoidMag){
+function weightedPoissonDiskSampling(img, numTriesPer, minDist, maxDist, sigmoidMag){
   let cellSize = maxDist / sqrt(2);
   let processQueue = new Deque();
   let pointsPlaced = [];
@@ -74,25 +76,24 @@ function weightedPoissonDiskSampling(img, pointGenCnt, minDist, maxDist, sigmoid
     grid.push(row);
   }
     
-  // Generate random point
-  let startPoints = uniformPoissonDiskSampling(img, pointGenCnt, minDist);
+  // Start off with a uniform distrbution of random points
+  // Why we use uniform poisson disc over just randomly generating points: Randomly generated points tend to form tight clusters and way too sparse vacant spaces. This can lead to having high density at lighter regions while having low density at darker regions. Uniform poisson disc ensures a random but still even distribution.
+  // Why we don't use only one or very few starting point(s): Imagine starting points begin at the top left of the screen. Since poisson disk in general has a hash RNG component, the points may never reach the bottom right of the screen. This leads to part of the image being fully ignored.
+  let startPoints = uniformPoissonDiskSampling(img, numTriesPer, minDist);
   for (let v of startPoints){
-    // Run an RNG check to see if we check the point (higher chances of using point the darker it is)
-    let percent = 0.5 + (0.5 - get(int(v.x), int(v.y))[0]/255/2);
-    let roll = random(0,1);
-    if (roll <= percent) processQueue.pushFront(v);
-    else print("Passed");
+    processQueue.pushFront(v);
   }
   
-  // Begin generating other points
+  // Treat every point of the uniform point spread as a source for weighted poisson disk sampling
+  // Weighted poisson disk sampling priorize tight clusters for dark regions and sparse distibution for lighter regions.
   while (processQueue.length > 0){
     let p = processQueue.popFront();
     let gray = get(int(p.x), int(p.y))[0];
     let minRadius = minDist + sigmoid(gray/255, sigmoidMag) * (maxDist - minDist);
     let pointSet = [];
-    let lowGray = gray - 20; 
+    let lowGray = gray - 20;
     let highGray = gray + 20;
-    for (let i = 0; i < pointGenCnt;i++){
+    for (let i = 0; i < numTriesPer;i++){
       let newP = generateNewPoint(p, minRadius);
       let newGray = get(int(newP.x), int(newP.y))[0];
       if (newP.x > 0 && newP.x < img.width && newP.y > 0 && newP.y < img.height && inNeighborHood(newP, grid, cellSize, minRadius)==false && lowGray < newGray && newGray < highGray) {
@@ -107,7 +108,8 @@ function weightedPoissonDiskSampling(img, pointGenCnt, minDist, maxDist, sigmoid
   return pointsPlaced;
 }
 
-function uniformPoissonDiskSampling(img, pointGenCnt, minDist){
+function uniformPoissonDiskSampling(img, numTriesPer, minDist){
+  // Create an even yet random distribution of points
   let cellSize = minDist / sqrt(2);
   let processQueue = new Deque();
   let pointsPlaced = [];
@@ -134,7 +136,7 @@ function uniformPoissonDiskSampling(img, pointGenCnt, minDist){
   while (processQueue.length > 0){
     let p = processQueue.popFront();
     let cnt = 0;
-    for (let i = 0; i < pointGenCnt;i++){
+    for (let i = 0; i < numTriesPer;i++){
       let newP = generateNewPoint(p, minDist);
       if (newP.x > 0 && newP.x < img.width && newP.y > 0 && newP.y < img.height && inNeighborHood(newP, grid, cellSize, minDist)==false){
         processQueue.pushFront(newP);
