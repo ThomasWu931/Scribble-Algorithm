@@ -8,14 +8,3 @@ Link To The Project: https://editor.p5js.org/Mandaranian-Cactus/sketches/ZJm7t0R
     <td><img align="center" src="Zombie.PNG"></td>
   </tr>
 </table>
-
-<html>
-  <head>
-    <title>
-      My Website
-    </title>
-  </head>
-  <body>
-    Hello, World!
-  </body>
-</html>
